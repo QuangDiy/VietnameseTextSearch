@@ -66,6 +66,7 @@ def evaluate_vimedaqa(
     device='cuda',
     prev_query='<|query|> ',
     name='all',
+    base_model=None,
 ):
     """Evaluate on ViMedAQA dataset."""
     from datasets import load_dataset
@@ -132,6 +133,7 @@ def evaluate_vimedaqa(
         result_folder='./results',
         split='test[:10]',
         name='all',
+        base_model=base_model,
     ).run()
 
 
@@ -141,10 +143,11 @@ def evaluate_vimedaqa_all(
     token=None,
     device='cuda',
     prev_query='<|query|> ',
+    base_model=None,
 ):
     """Evaluate on all ViMedAQA subsets."""
     for name in ['all', 'drug', 'medicine', 'disease', 'body-part']:
-        evaluate_vimedaqa(model_name, model_type, token, device, prev_query, name)
+        evaluate_vimedaqa(model_name, model_type, token, device, prev_query, name, base_model=base_model)
 
 
 # ─── ViGLUE-R Evaluation ──────────────────────────────────────────────────────
@@ -154,6 +157,7 @@ def evaluate_viglue_r(
     model_type='mean_pooling',
     token=None,
     device='cuda',
+    base_model=None,
 ):
     """Evaluate on ViGLUE-R (MNLI-R and QNLI-R)."""
     def preprocess(dataset):
@@ -179,6 +183,7 @@ def evaluate_viglue_r(
         extract_text_fn=preprocess,
         result_folder='./results',
         split='mnli_r',
+        base_model=base_model,
     ).run()
 
     print('  QNLI-R...')
@@ -192,6 +197,7 @@ def evaluate_viglue_r(
         extract_text_fn=preprocess,
         result_folder='./results',
         split='qnli_r',
+        base_model=base_model,
     ).run()
 
 
@@ -202,6 +208,7 @@ def evaluate_vinli(
     model_type='mean_pooling',
     token=None,
     device='cuda',
+    base_model=None,
 ):
     """Evaluate on ViNLI reranking."""
     def preprocess(dataset):
@@ -226,6 +233,7 @@ def evaluate_vinli(
         extract_text_fn=preprocess,
         result_folder='./results',
         split='test',
+        base_model=base_model,
     ).run()
 
 
@@ -236,19 +244,21 @@ def evaluate_all(
     model_type='mean_pooling',
     token=None,
     device='cuda',
+    base_model=None,
 ):
     """Run ALL evaluation benchmarks."""
     print('=' * 60)
     print('ModernBERT Evaluation Script')
     print('=' * 60)
     print(f'Model:       {model_name}')
+    print(f'Base model:  {base_model or "(same as model)"}')
     print(f'Model type:  {model_type}')
     print(f'Device:      {device}')
     print('=' * 60)
 
-    evaluate_vimedaqa_all(model_name, model_type, token, device)
-    evaluate_viglue_r(model_name, model_type, token, device)
-    evaluate_vinli(model_name, model_type, token, device)
+    evaluate_vimedaqa_all(model_name, model_type, token, device, base_model=base_model)
+    evaluate_viglue_r(model_name, model_type, token, device, base_model=base_model)
+    evaluate_vinli(model_name, model_type, token, device, base_model=base_model)
 
     print('\n' + '=' * 60)
     print('All evaluations complete!')
@@ -273,14 +283,16 @@ if __name__ == '__main__':
     parser.add_argument('--benchmark', type=str, default='all',
                         choices=['all', 'vimedaqa', 'viglue_r', 'vinli'],
                         help='Which benchmark to run')
+    parser.add_argument('--base_model', type=str, default=None,
+                        help='Base model for architecture (use when loading Trainer checkpoints)')
 
     args = parser.parse_args()
 
     if args.benchmark == 'all':
-        evaluate_all(args.model_name, args.model_type, args.token, args.device)
+        evaluate_all(args.model_name, args.model_type, args.token, args.device, base_model=args.base_model)
     elif args.benchmark == 'vimedaqa':
-        evaluate_vimedaqa_all(args.model_name, args.model_type, args.token, args.device)
+        evaluate_vimedaqa_all(args.model_name, args.model_type, args.token, args.device, base_model=args.base_model)
     elif args.benchmark == 'viglue_r':
-        evaluate_viglue_r(args.model_name, args.model_type, args.token, args.device)
+        evaluate_viglue_r(args.model_name, args.model_type, args.token, args.device, base_model=args.base_model)
     elif args.benchmark == 'vinli':
-        evaluate_vinli(args.model_name, args.model_type, args.token, args.device)
+        evaluate_vinli(args.model_name, args.model_type, args.token, args.device, base_model=args.base_model)
