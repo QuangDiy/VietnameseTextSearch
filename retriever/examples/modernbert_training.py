@@ -334,7 +334,7 @@ def train_modernbert(
 
     trainer = Trainer(
         args=training_args,
-        tokenizer=tokenizer,
+        processing_class=tokenizer,
         model=model,
         train_dataset=train_dataset,
         data_collator=collator,
