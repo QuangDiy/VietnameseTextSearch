@@ -283,7 +283,7 @@ def train_modernbert(
         token=token,
         loss_fn=loss_enum,
         model_wrapper=model_wrapper,
-        push_to_hub_id=model_repo_id,
+
         dropout_list=dropout_list,
     )
 
@@ -351,9 +351,9 @@ def train_modernbert(
 
         if output_dict['loss'] < best_result:
             best_result = output_dict['loss']
-            print('Found better model, pushing to hub...')
-            model.push_to_hub(model_repo_id, token=token,
-                              commit_message=output_dict['description'])
+            print('Found better model, saving locally...')
+            model.save_pretrained(output_dir)
+            tokenizer.save_pretrained(output_dir)
 
         # Train
         trainer.train()
@@ -363,9 +363,9 @@ def train_modernbert(
     print(f'\nFinal: {output_dict["description"]}')
 
     if output_dict['loss'] < best_result:
-        print('Found better model, pushing to hub...')
-        model.push_to_hub(model_repo_id, token=token,
-                          commit_message=output_dict['description'])
+        print('Found better model, saving locally...')
+        model.save_pretrained(output_dir)
+        tokenizer.save_pretrained(output_dir)
 
     print('\nTraining complete!')
 
