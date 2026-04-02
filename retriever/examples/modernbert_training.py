@@ -332,7 +332,17 @@ def train_modernbert(
         save_total_limit=1,
     )
 
-    trainer = Trainer(
+    class ModernBertTrainer(Trainer):
+        def _save(self, output_dir=None, state_dict=None):
+            output_dir = output_dir or self.args.output_dir
+            os.makedirs(output_dir, exist_ok=True)
+            unwrapped = self.model
+            if hasattr(unwrapped, 'module'):
+                unwrapped = unwrapped.module
+            unwrapped.model.save_pretrained(output_dir)
+            tokenizer.save_pretrained(output_dir)
+
+    trainer = ModernBertTrainer(
         args=training_args,
         processing_class=tokenizer,
         model=model,
@@ -394,9 +404,9 @@ if __name__ == '__main__':
     parser.add_argument('--loss_fn', type=str, default='dropinfonce',
                         choices=['dropinfonce', 'infonce'],
                         help='Loss function')
-    parser.add_argument('--batch_size', type=int, default=48,
+    parser.add_argument('--batch_size', type=int, default=64,
                         help='Training batch size')
-    parser.add_argument('--num_repeat', type=int, default=1,
+    parser.add_argument('--num_repeat', type=int, default=3,
                         help='Number of training repeats')
     parser.add_argument('--train_style', type=int, default=2, choices=[2, 3],
                         help='2=in-batch negative, 3=hard-negative')

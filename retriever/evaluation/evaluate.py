@@ -11,6 +11,7 @@ class JustEvaluate:
                  device='cuda',
                  extract_text_fn=None,
                  result_folder: str = './results',
+                 base_model=None,
                  **kwargs):
         self.evaluator = evaluator(
             dataset_name_or_path,
@@ -24,7 +25,8 @@ class JustEvaluate:
             model_name_or_path=model_name_or_path,
             model_wrapper=model_wrapper,
             token=token,
-            device=device
+            device=device,
+            base_model=base_model,
         )
 
     def run(self, **kwargs):
