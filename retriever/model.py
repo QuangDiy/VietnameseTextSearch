@@ -82,7 +82,8 @@ class PairLoss(nn.Module):
                     print('WARNING: add new special token successfully')
 
             model.resize_token_embeddings(len(tokenizer))
-            print(f'WARNING: model embedding: {model.embeddings.word_embeddings}')
+            emb = getattr(model.embeddings, 'tok_embeddings', None) or getattr(model.embeddings, 'word_embeddings', None)
+            print(f'WARNING: model embedding: {emb}')
             print(f'WARNING: tokenizer size: {len(tokenizer)}')
         else:
             tokenizer = AutoTokenizer.from_pretrained(model_name_or_path, token=token)
@@ -181,7 +182,8 @@ class SimilarityLoss(nn.Module):
                     print('WARNING: add new special token successfully')
 
             model.resize_token_embeddings(len(tokenizer))
-            print(f'WARNING: model embedding: {model.embeddings.word_embeddings}')
+            emb = getattr(model.embeddings, 'tok_embeddings', None) or getattr(model.embeddings, 'word_embeddings', None)
+            print(f'WARNING: model embedding: {emb}')
             print(f'WARNING: tokenizer size: {len(tokenizer)}')
         else:
             tokenizer = AutoTokenizer.from_pretrained(model_name_or_path, token=token)
