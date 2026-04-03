@@ -20,6 +20,8 @@ from typing import List, Dict
 import sys
 import os
 
+os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "expandable_segments:True"
+
 # Add parent directory to path for imports
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..'))
 
@@ -230,7 +232,7 @@ def train_modernbert(
     device='cuda',
     loss_fn='dropinfonce',
     num_repeat=1,
-    batch_size=48,
+    batch_size=48, 
     train_style=2,
     learning_rate=5e-5,
     max_length=4096,
@@ -330,8 +332,7 @@ def train_modernbert(
         per_device_train_batch_size=batch_size,
         per_device_eval_batch_size=batch_size,
         num_train_epochs=1,
-        save_total_limit=2,
-        save_steps=5000,
+        save_total_limit=1,
     )
 
     class ModernBertTrainer(Trainer):
@@ -410,7 +411,7 @@ if __name__ == '__main__':
     parser.add_argument('--loss_fn', type=str, default='dropinfonce',
                         choices=['dropinfonce', 'infonce'],
                         help='Loss function')
-    parser.add_argument('--batch_size', type=int, default=64,
+    parser.add_argument('--batch_size', type=int, default=48,
                         help='Training batch size')
     parser.add_argument('--num_repeat', type=int, default=3,
                         help='Number of training repeats')

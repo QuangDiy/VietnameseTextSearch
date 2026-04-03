@@ -44,6 +44,17 @@ class PairLoss(nn.Module):
 
         return output
     
+    def gradient_checkpointing_enable(self, gradient_checkpointing_kwargs=None):
+        if hasattr(self.model, 'gradient_checkpointing_enable'):
+            if gradient_checkpointing_kwargs:
+                self.model.gradient_checkpointing_enable(gradient_checkpointing_kwargs=gradient_checkpointing_kwargs)
+            else:
+                self.model.gradient_checkpointing_enable()
+
+    def gradient_checkpointing_disable(self):
+        if hasattr(self.model, 'gradient_checkpointing_disable'):
+            self.model.gradient_checkpointing_disable()
+
     def push_to_hub(self, *args, **kwargs):
         print('push to hub')
         self.model.push_to_hub(*args, **kwargs)
@@ -146,6 +157,17 @@ class SimilarityLoss(nn.Module):
 
         return output
     
+    def gradient_checkpointing_enable(self, gradient_checkpointing_kwargs=None):
+        if hasattr(self.model, 'gradient_checkpointing_enable'):
+            if gradient_checkpointing_kwargs:
+                self.model.gradient_checkpointing_enable(gradient_checkpointing_kwargs=gradient_checkpointing_kwargs)
+            else:
+                self.model.gradient_checkpointing_enable()
+
+    def gradient_checkpointing_disable(self):
+        if hasattr(self.model, 'gradient_checkpointing_disable'):
+            self.model.gradient_checkpointing_disable()
+
     def push_to_hub(self, *args, **kwargs):
         self.model.push_to_hub(*args, **kwargs)
 
