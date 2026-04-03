@@ -237,6 +237,7 @@ def train_modernbert(
     dropout_list=(0.1, 0.15),
     output_dir='./modernbert_output',
     logging_steps=1000,
+    resume_from_checkpoint=None,
 ):
     """
     Train ModernBERT (bert-tiny-stage2-hf) for Vietnamese retrieval.
@@ -329,7 +330,8 @@ def train_modernbert(
         per_device_train_batch_size=batch_size,
         per_device_eval_batch_size=batch_size,
         num_train_epochs=1,
-        save_total_limit=1,
+        save_total_limit=2,
+        save_steps=5000,
     )
 
     class ModernBertTrainer(Trainer):
@@ -366,7 +368,11 @@ def train_modernbert(
             tokenizer.save_pretrained(output_dir)
 
         # Train
-        trainer.train()
+        if repeat_idx == 0 and resume_from_checkpoint:
+            print(f'Resuming from checkpoint: {resume_from_checkpoint}')
+            trainer.train(resume_from_checkpoint=resume_from_checkpoint)
+        else:
+            trainer.train()
 
     # Final evaluation
     output_dict = check_model(model, eval_dataset, collator, eval_batch=batch_size)
@@ -418,6 +424,8 @@ if __name__ == '__main__':
                         help='Output directory for checkpoints')
     parser.add_argument('--logging_steps', type=int, default=1000,
                         help='Log every N steps')
+    parser.add_argument('--resume_from_checkpoint', type=str, default=None,
+                        help='Path to checkpoint dir to resume training from (or "True" to auto-detect latest)')
 
     args = parser.parse_args()
 
@@ -436,4 +444,5 @@ if __name__ == '__main__':
         max_length=args.max_length,
         output_dir=args.output_dir,
         logging_steps=args.logging_steps,
+        resume_from_checkpoint=args.resume_from_checkpoint if args.resume_from_checkpoint != 'True' else True,
     )
