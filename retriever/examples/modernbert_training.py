@@ -332,7 +332,8 @@ def train_modernbert(
         per_device_train_batch_size=batch_size,
         per_device_eval_batch_size=batch_size,
         num_train_epochs=1,
-        save_total_limit=1,
+        save_total_limit=2,
+        save_steps=5000,
     )
 
     class ModernBertTrainer(Trainer):
